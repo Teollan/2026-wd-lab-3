@@ -1,35 +1,54 @@
-@import './base.css';
+@import 'tailwindcss';
+
+@theme {
+  /* Primary accent */
+  --color-accent: #0ea5e9;
+  --color-accent-hover: #38bdf8;
+  --color-accent-light: #7dd3fc;
+
+  /* Surface layers */
+  --color-surface-primary: #030712;
+  --color-surface-secondary: #111827;
+  --color-surface-tertiary: rgba(255, 255, 255, 0.05);
+
+  /* Content hierarchy */
+  --color-content-primary: #ffffff;
+  --color-content-secondary: #9ca3af;
+  --color-content-tertiary: #6b7280;
+
+  /* Destructive */
+  --color-destructive: #ef4444;
+  --color-destructive-hover: #f87171;
+
+  /* Stroke / borders */
+  --color-stroke-primary: rgba(255, 255, 255, 0.1);
+  --color-stroke-secondary: #374151;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: var(--color-surface-primary);
+  color: var(--color-content-secondary);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+main {
+  height: 100%;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+input[type='date']::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+input[type='date']:invalid::-webkit-datetime-edit {
+  color: var(--color-content-tertiary);
 }
