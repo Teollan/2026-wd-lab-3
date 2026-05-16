@@ -1,14 +1,10 @@
 import type { FastifyInstance } from "fastify";
 import { prisma } from "../db.js";
 import { handlePrismaError } from "../lib/prismaError.js";
+import { authenticate } from "../lib/auth.js";
 import { type User, toPublicUser } from "../models/user.js";
 import type { Comment, CommentWithAuthor } from "../models/comment.js";
-import {
-  type CreatePostInput,
-  type UpdatePostInput,
-  type Post,
-  type PostWithRelations,
-} from "../models/post.js";
+import { type Post, type PostWithRelations } from "../models/post.js";
 
 const WITH_RELATIONS = {
   include: {
@@ -22,6 +18,13 @@ const WITH_RELATIONS = {
 
 type CommentRow = Comment & { author: User };
 type PostRow = Post & { author: User; comments: CommentRow[] };
+
+interface CreatePostBody {
+  title: string;
+  content: string;
+}
+
+type UpdatePostBody = Partial<CreatePostBody>;
 
 function toPostWithRelations(post: PostRow): PostWithRelations {
   return {
@@ -50,23 +53,18 @@ function parseId(raw: string): number | null {
 }
 
 export async function postsRoutes(app: FastifyInstance) {
-  app.post<{ Body: CreatePostInput }>("/", async (request, reply) => {
-    const { authorId, title, content } = request.body ?? {};
+  app.post<{ Body: CreatePostBody }>("/", { preHandler: authenticate }, async (request, reply) => {
+    const { title, content } = request.body ?? {};
 
-    if (!authorId || !title || !content) {
+    if (!title || !content) {
       return reply.status(400).send({ error: "Missing required fields" });
     }
 
-    try {
-      const post: Post = await prisma.post.create({
-        data: { authorId, title, content },
-      });
+    const post: Post = await prisma.post.create({
+      data: { authorId: request.user.id, title, content },
+    });
 
-      return reply.status(201).send(post);
-    } catch (err) {
-      if (handlePrismaError(err, reply)) return;
-      throw err;
-    }
+    return reply.status(201).send(post);
   });
 
   app.get<{ Querystring: { authorId?: string } }>(
@@ -98,13 +96,21 @@ export async function postsRoutes(app: FastifyInstance) {
     return toPostWithRelations(post);
   });
 
-  app.patch<{ Params: { id: string }; Body: UpdatePostInput }>("/:id", async (request, reply) => {
-    const id = parseId(request.params.id);
-    if (id === null) return reply.status(400).send({ error: "Invalid id" });
+  app.patch<{ Params: { id: string }; Body: UpdatePostBody }>(
+    "/:id",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const id = parseId(request.params.id);
+      if (id === null) return reply.status(400).send({ error: "Invalid id" });
 
-    const body = request.body ?? {};
+      const existing = await prisma.post.findUnique({ where: { id } });
+      if (!existing) return reply.status(404).send({ error: "Not found" });
+      if (existing.authorId !== request.user.id) {
+        return reply.status(403).send({ error: "Forbidden" });
+      }
 
-    try {
+      const body = request.body ?? {};
+
       const post: Post = await prisma.post.update({
         where: { id },
         data: {
@@ -114,22 +120,29 @@ export async function postsRoutes(app: FastifyInstance) {
       });
 
       return post;
-    } catch (err) {
-      if (handlePrismaError(err, reply)) return;
-      throw err;
-    }
-  });
+    },
+  );
 
-  app.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
-    const id = parseId(request.params.id);
-    if (id === null) return reply.status(400).send({ error: "Invalid id" });
+  app.delete<{ Params: { id: string } }>(
+    "/:id",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const id = parseId(request.params.id);
+      if (id === null) return reply.status(400).send({ error: "Invalid id" });
 
-    try {
-      await prisma.post.delete({ where: { id } });
-      return reply.status(204).send();
-    } catch (err) {
-      if (handlePrismaError(err, reply)) return;
-      throw err;
-    }
-  });
+      const existing = await prisma.post.findUnique({ where: { id } });
+      if (!existing) return reply.status(404).send({ error: "Not found" });
+      if (existing.authorId !== request.user.id) {
+        return reply.status(403).send({ error: "Forbidden" });
+      }
+
+      try {
+        await prisma.post.delete({ where: { id } });
+        return reply.status(204).send();
+      } catch (err) {
+        if (handlePrismaError(err, reply)) return;
+        throw err;
+      }
+    },
+  );
 }

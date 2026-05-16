@@ -1,56 +1,70 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { AxiosError } from 'axios'
 import type { User } from '@/models/User'
-import { AuthRepository } from '@/repositories/auth.repository'
+import { signIn as apiSignIn, signUp as apiSignUp, fetchMe } from '@/api/auth'
+import type { SignUpInput } from '@/api/auth'
+import { getToken, setToken, clearToken } from '@/api/token'
 
-interface SignInInput {
-  email: string
-  password: string
-}
-
-interface SignUpInput {
-  email: string
-  username: string
-  password: string
-  dateOfBirth: Date
-  gender: string
-  bio: string
+function errorMessage(e: unknown, fallback: string): string {
+  if (e instanceof AxiosError) {
+    return e.response?.data?.error ?? fallback
+  }
+  return fallback
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(AuthRepository.findAuthUser())
+  const user = ref<User | null>(null)
   const error = ref<string | null>(null)
 
   const isAuthenticated = computed(() => user.value !== null)
 
-  function signIn(input: SignInInput): boolean {
+  /** Hydrate session from a stored token on app start. */
+  async function init(): Promise<void> {
+    if (!getToken()) {
+      return
+    }
+
     try {
-      user.value = AuthRepository.signIn(input)
+      user.value = await fetchMe()
+    } catch {
+      clearToken()
+      user.value = null
+    }
+  }
+
+  async function signIn(email: string, password: string): Promise<boolean> {
+    try {
+      const { token, user: u } = await apiSignIn(email, password)
+      setToken(token)
+      user.value = u
       error.value = null
 
       return true
     } catch (e) {
-      error.value = (e as Error).message
+      error.value = errorMessage(e, 'Sign in failed')
 
       return false
     }
   }
 
-  function signUp(input: SignUpInput): boolean {
+  async function signUp(input: SignUpInput): Promise<boolean> {
     try {
-      user.value = AuthRepository.signUp(input)
+      const { token, user: u } = await apiSignUp(input)
+      setToken(token)
+      user.value = u
       error.value = null
 
       return true
     } catch (e) {
-      error.value = (e as Error).message
+      error.value = errorMessage(e, 'Sign up failed')
 
       return false
     }
   }
 
   function logOut(): void {
-    AuthRepository.logOut()
+    clearToken()
     user.value = null
   }
 
@@ -58,5 +72,5 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
   }
 
-  return { user, error, isAuthenticated, signIn, signUp, logOut, clearError }
+  return { user, error, isAuthenticated, init, signIn, signUp, logOut, clearError }
 })

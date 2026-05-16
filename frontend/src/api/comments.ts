@@ -9,7 +9,6 @@ export async function fetchCommentsByAuthor(authorId: number): Promise<{ id: num
 
 export async function createComment(input: {
   postId: number
-  authorId: number
   content: string
 }): Promise<void> {
   await api.post('/comments', input)

@@ -15,13 +15,13 @@ const gender = ref('')
 const dateOfBirth = ref('')
 const bio = ref('')
 
-function onSubmit() {
-  const ok = authStore.signUp({
+async function onSubmit() {
+  const ok = await authStore.signUp({
     username: username.value,
     email: email.value,
     password: password.value,
     gender: gender.value,
-    dateOfBirth: new Date(dateOfBirth.value),
+    dateOfBirth: dateOfBirth.value,
     bio: bio.value,
   })
 

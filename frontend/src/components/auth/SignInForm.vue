@@ -11,8 +11,8 @@ const { error } = storeToRefs(authStore)
 const email = ref('')
 const password = ref('')
 
-function onSubmit() {
-  if (authStore.signIn({ email: email.value, password: password.value })) {
+async function onSubmit() {
+  if (await authStore.signIn(email.value, password.value)) {
     router.push('/feed')
   }
 }

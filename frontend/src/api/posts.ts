@@ -75,7 +75,6 @@ export async function fetchPost(id: number): Promise<PostWithAuthorAndComments> 
 }
 
 export async function createPost(input: {
-  authorId: number
   title: string
   content: string
 }): Promise<void> {

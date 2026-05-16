@@ -19,12 +19,7 @@ export const useMyPostsStore = defineStore('myPosts', () => {
   }
 
   async function createComment(postId: number, content: string): Promise<void> {
-    const auth = useAuthStore()
-    if (!auth.user) {
-      return
-    }
-
-    await apiCreateComment({ postId, authorId: auth.user.id, content })
+    await apiCreateComment({ postId, content })
     await load()
   }
 

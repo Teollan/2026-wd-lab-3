@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import type { PostWithAuthorAndComments } from '@/models/Post'
 import { fetchFeed } from '@/api/posts'
 import { createComment as apiCreateComment } from '@/api/comments'
-import { useAuthStore } from '@/stores/auth'
 
 export const useFeedStore = defineStore('feed', () => {
   const posts = ref<PostWithAuthorAndComments[]>([])
@@ -13,12 +12,7 @@ export const useFeedStore = defineStore('feed', () => {
   }
 
   async function createComment(postId: number, content: string): Promise<void> {
-    const auth = useAuthStore()
-    if (!auth.user) {
-      return
-    }
-
-    await apiCreateComment({ postId, authorId: auth.user.id, content })
+    await apiCreateComment({ postId, content })
     await load()
   }
 

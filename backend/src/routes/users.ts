@@ -2,13 +2,8 @@ import type { FastifyInstance } from "fastify";
 import { prisma } from "../db.js";
 import { hashPassword } from "../lib/password.js";
 import { handlePrismaError } from "../lib/prismaError.js";
-import {
-  type CreateUserInput,
-  type UpdateUserInput,
-  type PublicUser,
-  type User,
-  toPublicUser,
-} from "../models/user.js";
+import { authenticate } from "../lib/auth.js";
+import { type UpdateUserInput, type PublicUser, type User, toPublicUser } from "../models/user.js";
 
 function parseId(raw: string): number | null {
   const id = Number(raw);
@@ -16,32 +11,6 @@ function parseId(raw: string): number | null {
 }
 
 export async function usersRoutes(app: FastifyInstance) {
-  app.post<{ Body: CreateUserInput }>("/", async (request, reply) => {
-    const { email, password, username, dateOfBirth, gender, bio } = request.body ?? {};
-
-    if (!email || !password || !username || !dateOfBirth || !gender || !bio) {
-      return reply.status(400).send({ error: "Missing required fields" });
-    }
-
-    try {
-      const user: User = await prisma.user.create({
-        data: {
-          email,
-          password: await hashPassword(password),
-          username,
-          dateOfBirth: new Date(dateOfBirth),
-          gender,
-          bio,
-        },
-      });
-
-      return reply.status(201).send(toPublicUser(user));
-    } catch (err) {
-      if (handlePrismaError(err, reply)) return;
-      throw err;
-    }
-  });
-
   app.get("/", async (): Promise<PublicUser[]> => {
     const users: User[] = await prisma.user.findMany();
     return users.map(toPublicUser);
@@ -57,46 +26,60 @@ export async function usersRoutes(app: FastifyInstance) {
     return toPublicUser(user);
   });
 
-  app.patch<{ Params: { id: string }; Body: UpdateUserInput }>("/:id", async (request, reply) => {
-    const id = parseId(request.params.id);
-    if (id === null) return reply.status(400).send({ error: "Invalid id" });
+  app.patch<{ Params: { id: string }; Body: UpdateUserInput }>(
+    "/:id",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const id = parseId(request.params.id);
+      if (id === null) return reply.status(400).send({ error: "Invalid id" });
+      if (id !== request.user.id) {
+        return reply.status(403).send({ error: "Forbidden" });
+      }
 
-    const body = request.body ?? {};
+      const body = request.body ?? {};
 
-    try {
-      const user: User = await prisma.user.update({
-        where: { id },
-        data: {
-          ...(body.email !== undefined && { email: body.email }),
-          ...(body.password !== undefined && {
-            password: await hashPassword(body.password),
-          }),
-          ...(body.username !== undefined && { username: body.username }),
-          ...(body.dateOfBirth !== undefined && {
-            dateOfBirth: new Date(body.dateOfBirth),
-          }),
-          ...(body.gender !== undefined && { gender: body.gender }),
-          ...(body.bio !== undefined && { bio: body.bio }),
-        },
-      });
+      try {
+        const user: User = await prisma.user.update({
+          where: { id },
+          data: {
+            ...(body.email !== undefined && { email: body.email }),
+            ...(body.password !== undefined && {
+              password: await hashPassword(body.password),
+            }),
+            ...(body.username !== undefined && { username: body.username }),
+            ...(body.dateOfBirth !== undefined && {
+              dateOfBirth: new Date(body.dateOfBirth),
+            }),
+            ...(body.gender !== undefined && { gender: body.gender }),
+            ...(body.bio !== undefined && { bio: body.bio }),
+          },
+        });
 
-      return toPublicUser(user);
-    } catch (err) {
-      if (handlePrismaError(err, reply)) return;
-      throw err;
-    }
-  });
+        return toPublicUser(user);
+      } catch (err) {
+        if (handlePrismaError(err, reply)) return;
+        throw err;
+      }
+    },
+  );
 
-  app.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
-    const id = parseId(request.params.id);
-    if (id === null) return reply.status(400).send({ error: "Invalid id" });
+  app.delete<{ Params: { id: string } }>(
+    "/:id",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const id = parseId(request.params.id);
+      if (id === null) return reply.status(400).send({ error: "Invalid id" });
+      if (id !== request.user.id) {
+        return reply.status(403).send({ error: "Forbidden" });
+      }
 
-    try {
-      await prisma.user.delete({ where: { id } });
-      return reply.status(204).send();
-    } catch (err) {
-      if (handlePrismaError(err, reply)) return;
-      throw err;
-    }
-  });
+      try {
+        await prisma.user.delete({ where: { id } });
+        return reply.status(204).send();
+      } catch (err) {
+        if (handlePrismaError(err, reply)) return;
+        throw err;
+      }
+    },
+  );
 }
