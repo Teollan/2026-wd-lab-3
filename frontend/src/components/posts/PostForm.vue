@@ -19,12 +19,8 @@ const content = ref(props.initialContent)
 
 const isEditing = computed(() => props.mode === 'edit')
 const heading = computed(() => (isEditing.value ? 'Edit Post' : 'New Post'))
-const subheading = computed(() =>
-  isEditing.value ? 'Update your post' : 'Create a new post',
-)
-const buttonLabel = computed(() =>
-  isEditing.value ? 'Save changes' : 'Publish post',
-)
+const subheading = computed(() => (isEditing.value ? 'Update your post' : 'Create a new post'))
+const buttonLabel = computed(() => (isEditing.value ? 'Save changes' : 'Publish post'))
 
 function onSubmit() {
   emit('submit', { title: title.value, content: content.value })
@@ -44,10 +40,7 @@ function onSubmit() {
 
       <form class="space-y-4" @submit.prevent="onSubmit">
         <div>
-          <label
-            for="post-title"
-            class="mb-1 block text-sm font-medium text-content-secondary"
-          >
+          <label for="post-title" class="mb-1 block text-sm font-medium text-content-secondary">
             Title
           </label>
 
@@ -63,10 +56,7 @@ function onSubmit() {
         </div>
 
         <div>
-          <label
-            for="post-body"
-            class="mb-1 block text-sm font-medium text-content-secondary"
-          >
+          <label for="post-body" class="mb-1 block text-sm font-medium text-content-secondary">
             Content
           </label>
 

@@ -35,10 +35,7 @@ const initials = computed(() => getInitials(props.user.username))
 </script>
 
 <template>
-  <div
-    class="flex items-center justify-center rounded-full font-bold"
-    :class="[sizeClass, color]"
-  >
+  <div class="flex items-center justify-center rounded-full font-bold" :class="[sizeClass, color]">
     {{ initials }}
   </div>
 </template>

@@ -1,8 +1,6 @@
 import { api } from '@/api/client'
 
-export async function fetchCommentsByAuthor(
-  authorId: number,
-): Promise<{ id: number }[]> {
+export async function fetchCommentsByAuthor(authorId: number): Promise<{ id: number }[]> {
   const { data } = await api.get<{ id: number }[]>('/comments', {
     params: { authorId },
   })

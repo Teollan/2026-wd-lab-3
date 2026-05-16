@@ -13,9 +13,7 @@ defineProps<{
       :href="href"
       class="block px-3 py-2"
       :class="
-        isExactActive
-          ? 'text-accent-hover'
-          : 'text-content-secondary hover:text-content-primary'
+        isExactActive ? 'text-accent-hover' : 'text-content-secondary hover:text-content-primary'
       "
       @click="navigate"
     >

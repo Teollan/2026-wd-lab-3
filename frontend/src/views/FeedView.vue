@@ -12,11 +12,7 @@ onMounted(() => feedStore.load())
 </script>
 
 <template>
-  <PostList
-    title="Feed"
-    :posts="posts"
-    @create-comment="feedStore.createComment"
-  >
+  <PostList title="Feed" :posts="posts" @create-comment="feedStore.createComment">
     <template #empty>
       <FeedEmptyState />
     </template>

@@ -19,10 +19,7 @@ const emit = defineEmits<{
 
 <template>
   <article class="rounded-xl border border-stroke-primary bg-surface-secondary p-6">
-    <div
-      class="mb-3 flex items-center"
-      :class="showActions ? 'justify-between' : 'gap-3'"
-    >
+    <div class="mb-3 flex items-center" :class="showActions ? 'justify-between' : 'gap-3'">
       <div class="flex items-center gap-3">
         <AppAvatar :user="post.author" />
 

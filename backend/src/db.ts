@@ -1,16 +1,16 @@
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from './generated/client.js'
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "./generated/client.js";
 
-const connectionString = process.env.DATABASE_URL
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error('DATABASE_URL is not set')
+  throw new Error("DATABASE_URL is not set");
 }
 
-const adapter = new PrismaPg({ connectionString })
+const adapter = new PrismaPg({ connectionString });
 
-export const prisma = new PrismaClient({ adapter })
+export const prisma = new PrismaClient({ adapter });
 
 export async function pingDb(): Promise<void> {
-  await prisma.$queryRaw`SELECT 1`
+  await prisma.$queryRaw`SELECT 1`;
 }

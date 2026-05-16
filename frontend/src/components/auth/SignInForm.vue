@@ -22,9 +22,7 @@ onUnmounted(() => authStore.clearError())
 
 <template>
   <div class="mx-auto max-w-md">
-    <h1 class="mb-2 text-center text-3xl font-bold text-content-primary">
-      Welcome back
-    </h1>
+    <h1 class="mb-2 text-center text-3xl font-bold text-content-primary">Welcome back</h1>
 
     <p class="mb-8 text-center text-content-tertiary">Sign in to your account</p>
 
@@ -49,10 +47,7 @@ onUnmounted(() => authStore.clearError())
       </div>
 
       <div>
-        <label
-          for="password"
-          class="mb-1 block text-sm font-medium text-content-secondary"
-        >
+        <label for="password" class="mb-1 block text-sm font-medium text-content-secondary">
           Password
         </label>
 
@@ -76,15 +71,10 @@ onUnmounted(() => authStore.clearError())
           Remember me
         </label>
 
-        <a href="#" class="text-sm text-accent-hover hover:text-accent-light">
-          Forgot password?
-        </a>
+        <a href="#" class="text-sm text-accent-hover hover:text-accent-light"> Forgot password? </a>
       </div>
 
-      <p
-        v-if="error"
-        class="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive"
-      >
+      <p v-if="error" class="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
         {{ error }}
       </p>
 

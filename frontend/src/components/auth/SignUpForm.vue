@@ -35,9 +35,7 @@ onUnmounted(() => authStore.clearError())
 
 <template>
   <div class="mx-auto max-w-md">
-    <h1 class="mb-2 text-center text-3xl font-bold text-content-primary">
-      Create an account
-    </h1>
+    <h1 class="mb-2 text-center text-3xl font-bold text-content-primary">Create an account</h1>
 
     <p class="mb-8 text-center text-content-tertiary">Join BlogSpace today</p>
 
@@ -78,10 +76,7 @@ onUnmounted(() => authStore.clearError())
       </div>
 
       <div>
-        <label
-          for="password"
-          class="mb-1 block text-sm font-medium text-content-secondary"
-        >
+        <label for="password" class="mb-1 block text-sm font-medium text-content-secondary">
           Password
         </label>
 
@@ -139,10 +134,7 @@ onUnmounted(() => authStore.clearError())
       </fieldset>
 
       <div>
-        <label
-          for="date-of-birth"
-          class="mb-1 block text-sm font-medium text-content-secondary"
-        >
+        <label for="date-of-birth" class="mb-1 block text-sm font-medium text-content-secondary">
           Date of birth
         </label>
 
@@ -157,9 +149,7 @@ onUnmounted(() => authStore.clearError())
       </div>
 
       <div>
-        <label for="bio" class="mb-1 block text-sm font-medium text-content-secondary">
-          Bio
-        </label>
+        <label for="bio" class="mb-1 block text-sm font-medium text-content-secondary"> Bio </label>
 
         <textarea
           id="bio"
@@ -172,10 +162,7 @@ onUnmounted(() => authStore.clearError())
         ></textarea>
       </div>
 
-      <p
-        v-if="error"
-        class="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive"
-      >
+      <p v-if="error" class="rounded-lg bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
         {{ error }}
       </p>
 
