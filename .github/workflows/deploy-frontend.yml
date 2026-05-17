@@ -31,6 +31,17 @@ jobs:
 
       - run: npm ci
 
+      # TEMP DEBUG: variables are not masked. Remove once resolved.
+      # - "repo" must be Teollan/2026-wd-lab-3 (not a fork).
+      # - "all visible vars" lists every repo/org var this job can see, by name.
+      #   If VITE_API_URL is absent here, it was added as a Secret, or as an
+      #   Environment variable (this build job has no `environment:`), or on
+      #   the wrong repo, or under a different name.
+      - run: |
+          echo "repo: ${{ github.repository }}"
+          echo "VITE_API_URL is [${{ vars.VITE_API_URL }}]"
+          echo "all visible vars: ${{ toJSON(vars) }}"
+
       - run: npm run build
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
