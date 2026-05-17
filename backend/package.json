@@ -7,12 +7,12 @@
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && tsc && tsc-alias",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "start": "node --env-file-if-exists=.env dist/server.js",
-    "dev": "prisma generate && tsc && node --env-file-if-exists=.env dist/server.js",
+    "dev": "prisma generate && tsc && tsc-alias && node --env-file-if-exists=.env dist/server.js",
     "prisma:migrate": "prisma migrate dev",
     "prisma:prepare": "prisma migrate dev --create-only",
     "postinstall": "prisma generate"
@@ -32,6 +32,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.3",
     "prisma": "^7.8.0",
+    "tsc-alias": "^1.8.17",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3"
   }

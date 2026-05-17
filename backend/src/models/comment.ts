@@ -1,4 +1,4 @@
-import type { PublicUser } from "./user.js";
+import type { PublicUser } from "@/models/user.js";
 
 export interface Comment {
   id: number;

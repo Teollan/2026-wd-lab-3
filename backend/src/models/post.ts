@@ -1,5 +1,5 @@
-import type { PublicUser } from "./user.js";
-import type { CommentWithAuthor } from "./comment.js";
+import type { PublicUser } from "@/models/user.js";
+import type { CommentWithAuthor } from "@/models/comment.js";
 
 export interface Post {
   id: number;
