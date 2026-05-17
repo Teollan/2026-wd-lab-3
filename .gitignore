@@ -1,14 +1,8 @@
-# Secrets / env
 .env
 **/.env
 
-# Dependencies
 node_modules/
 
-# Build output
-backend/dist/
-
-# Prisma generated client (regenerated via `prisma generate`)
-backend/src/generated/
-
 .claude
+.vscode
+docs
