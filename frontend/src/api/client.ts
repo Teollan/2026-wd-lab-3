@@ -15,9 +15,6 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// On an expired/invalid token mid-session, drop it and bounce to sign-in.
-// Auth endpoints (sign-in/sign-up/me) handle their own 401s — a bad-credentials
-// 401 must show a form error, and /auth/me 401 is handled during bootstrap.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -27,7 +24,8 @@ api.interceptors.response.use(
 
     if (status === 401 && !isAuthRoute && getToken()) {
       clearToken()
-      window.location.assign('/sign-in')
+
+      window.location.assign(`${import.meta.env.BASE_URL}sign-in`)
     }
 
     return Promise.reject(error)

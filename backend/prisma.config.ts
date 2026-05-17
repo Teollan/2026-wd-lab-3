@@ -1,6 +1,10 @@
 import { defineConfig, env } from "prisma/config";
 
-process.loadEnvFile();
+try {
+  process.loadEnvFile();
+} catch {
+  // no .env file — rely on the ambient environment
+}
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
